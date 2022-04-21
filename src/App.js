@@ -35,35 +35,37 @@ function App() {
     var layerControl = L.control.layers(baseLayers);
     layerControl.addTo(map);
 
-    const tLayer = L.tileLayer
-      .wms("http://103.27.239.181:8080/geoserver/SMAP/wms", {
-        format: "image/png",
-        VERSION: "1.1.1",
-        tiled: true,
-        STYLES: "",
-        LAYERS: "SMAP:t",
-        exceptions: "application/vnd.ogc.se_inimage",
-        tilesOrigin: 97.7499973629945 + "," + 4.054536091177027,
-        transparent: true,
-      })
-      .addTo(map);
+    // const tLayer = L.tileLayer
+    //   .wms("http://103.27.239.181:8080/geoserver/SMAP/wms", {
+    //     format: "image/png",
+    //     VERSION: "1.1.1",
+    //     tiled: true,
+    //     STYLES: "",
+    //     LAYERS: "SMAP:t",
+    //     exceptions: "application/vnd.ogc.se_inimage",
+    //     tilesOrigin: 97.7499973629945 + "," + 4.054536091177027,
+    //     transparent: true,
+    //   })
+    //   .addTo(map);
 
-    layerControl.addOverlay(tLayer, "Nhiệt độ");
+    // layerControl.addOverlay(tLayer, "Nhiệt độ");
 
-    $.getJSON(`${process.env.PUBLIC_URL}/wind0.json`, function (data) {
-      var velocityLayer = L.velocityLayer({
-        displayValues: true,
-        displayOptions: {
-          velocityType: "GBR Wind",
-          position: "bottomleft",
-          emptyString: "No wind data",
-          showCardinal: true,
-        },
-        data: data,
-        maxVelocity: 10,
+    for (let index = 0; index < 13; index++) {
+      $.getJSON(`${process.env.PUBLIC_URL}/wind${index}.json`, function (data) {
+        var velocityLayer = L.velocityLayer({
+          displayValues: true,
+          displayOptions: {
+            velocityType: "GBR Wind",
+            position: "bottomleft",
+            emptyString: "No wind data",
+            showCardinal: true,
+          },
+          data: data,
+          maxVelocity: 10,
+        });
+        layerControl.addOverlay(velocityLayer, `Gió ${index}`);
       });
-      layerControl.addOverlay(velocityLayer, "Gió");
-    });
+    }
 
     map.addEventListener("click", onMapClick);
   }, []);
