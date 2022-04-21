@@ -5,7 +5,7 @@ import L from "leaflet";
 import { useEffect } from "react";
 import $ from "jquery";
 import "leaflet-velocity";
-import "./App.css";
+import { WindLayer } from "leaflet-wind";
 
 let map = null;
 
@@ -52,18 +52,93 @@ function App() {
 
     for (let index = 0; index < 13; index++) {
       $.getJSON(`${process.env.PUBLIC_URL}/wind${index}.json`, function (data) {
-        var velocityLayer = L.velocityLayer({
-          displayValues: true,
-          displayOptions: {
-            velocityType: "GBR Wind",
-            position: "bottomleft",
-            emptyString: "No wind data",
-            showCardinal: true,
+        // var velocityLayer = L.velocityLayer({
+        //   displayValues: true,
+        //   displayOptions: {
+        //     velocityType: "GBR Wind",
+        //     position: "bottomleft",
+        //     emptyString: "No wind data",
+        //     showCardinal: true,
+        //   },
+        //   data: data,
+        //   maxVelocity: 10,
+        // });
+        // layerControl.addOverlay(velocityLayer, `Gió ${index}`);
+
+        const velocityScale = [0.1, 0.2, 0.3, 0.4, 0.5];
+        const windLayer = new WindLayer("wind", data, {
+          // windOptions: {
+          //   // colorScale: (m) => {
+          //   //   // console.log(m);
+          //   //   return '#fff';
+          //   // },
+          //   colorScale: [
+          //     "rgb(36,104, 180)",
+          //     "rgb(60,157, 194)",
+          //     "rgb(128,205,193 )",
+          //     "rgb(151,218,168 )",
+          //     "rgb(198,231,181)",
+          //     "rgb(238,247,217)",
+          //     "rgb(255,238,159)",
+          //     "rgb(252,217,125)",
+          //     "rgb(255,182,100)",
+          //     "rgb(252,150,75)",
+          //     "rgb(250,112,52)",
+          //     "rgb(245,64,32)",
+          //     "rgb(237,45,28)",
+          //     "rgb(220,24,32)",
+          //     "rgb(180,0,35)",
+          //   ],
+          //   // velocityScale: 1 / 20,
+          //   // paths: 5000,
+          //   // frameRate: 16,
+          //   // maxAge: 60,
+          //   // globalAlpha: 0.9,
+          //   // velocityScale: () => {
+          //   //   return velocityScale[map.getZoom() - 5] * 0.1 || 0.1;
+          //   // },
+          //   // // paths: 10000,
+          //   // paths: 1000,
+          // },
+          windOptions: {
+            // colorScale: (m) => {
+            //   // console.log(m);
+            //   return '#fff';
+            // },
+            colorScale: [
+              "rgb(36,104, 180)",
+              "rgb(60,157, 194)",
+              "rgb(128,205,193 )",
+              "rgb(151,218,168 )",
+              "rgb(198,231,181)",
+              "rgb(238,247,217)",
+              "rgb(255,238,159)",
+              "rgb(252,217,125)",
+              "rgb(255,182,100)",
+              "rgb(252,150,75)",
+              "rgb(250,112,52)",
+              "rgb(245,64,32)",
+              "rgb(237,45,28)",
+              "rgb(220,24,32)",
+              "rgb(180,0,35)",
+            ],
+            // velocityScale: 1 / 20,
+            // paths: 5000,
+            frameRate: 16,
+            maxAge: 60,
+            globalAlpha: 0.9,
+            velocityScale: 1 / 500,
+            // paths: 880092,
+            generateParticleOption: true,
+            paths: () => {
+              // can be number or function
+              const zoom = map.getZoom();
+              return zoom * 1000;
+            },
           },
-          data: data,
-          maxVelocity: 10,
         });
-        layerControl.addOverlay(velocityLayer, `Gió ${index}`);
+        layerControl.addOverlay(windLayer, `Gió ${index}`);
+        // map.addLayer(windLayer);
       });
     }
 
@@ -84,8 +159,7 @@ function App() {
     var HEIGHT = map.getSize().y;
     var X = map.layerPointToContainerPoint(e.layerPoint).x;
     var Y = map.layerPointToContainerPoint(e.layerPoint).y;
-    var URL =
-      `http://103.27.239.181:8080/geoserver/SMAP/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&FORMAT=image/jpeg&TRANSPARENT=true&QUERY_LAYERS=SMAP:t&STYLES&LAYERS=SMAP:t&exceptions=application/vnd.ogc.se_inimage&INFO_FORMAT=text/html&FEATURE_COUNT=50&X=${X}&Y=${Y}&SRS=EPSG:4326&WIDTH=${WIDTH}&HEIGHT=${HEIGHT}&BBOX=${BBOX}`;
+    var URL = `http://103.27.239.181:8080/geoserver/SMAP/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&FORMAT=image/jpeg&TRANSPARENT=true&QUERY_LAYERS=SMAP:t&STYLES&LAYERS=SMAP:t&exceptions=application/vnd.ogc.se_inimage&INFO_FORMAT=text/html&FEATURE_COUNT=50&X=${X}&Y=${Y}&SRS=EPSG:4326&WIDTH=${WIDTH}&HEIGHT=${HEIGHT}&BBOX=${BBOX}`;
     popup.setLatLng(e.latlng);
     popup.setContent(
       "<iframe src='" +

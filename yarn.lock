@@ -4321,6 +4321,11 @@ get-symbol-description@^1.0.0:
     call-bind "^1.0.2"
     get-intrinsic "^1.1.1"
 
+gl-matrix@^3.3.0:
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/gl-matrix/-/gl-matrix-3.4.3.tgz#fc1191e8320009fd4d20e9339595c6041ddc22c9"
+  integrity sha512-wcCp8vu8FT22BnvKVPjXa/ICBWRq/zjFfdofZy1WSpQZpphblv12/bOQLBC1rMM7SGOFS9ltVmKOHil5+Ml7gA==
+
 glob-parent@^5.1.2, glob-parent@~5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-5.1.2.tgz#869832c58034fe68a4093c17dc15e8340d8401c4"
@@ -5533,6 +5538,13 @@ leaflet-velocity@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/leaflet-velocity/-/leaflet-velocity-2.1.2.tgz#6f4d728e5404dd84a27c14b21ca8941d2862853a"
   integrity sha512-KlMwjdQ3C32O96LV/JVDhzEGUum/P050KGTvKj8fE0NM0+Jb9cwguVrdwW999TZ/lbiGJHdkqOQPlWgKVTWBIw==
+
+leaflet-wind@^1.1.1-alpha.2:
+  version "1.1.1-alpha.2"
+  resolved "https://registry.yarnpkg.com/leaflet-wind/-/leaflet-wind-1.1.1-alpha.2.tgz#f367c29960f1075004591860e1c91756b665559f"
+  integrity sha512-JUOn9ynILqcHYQRW5o4DaPv8iYpIW2LwfWawOQKQKDpmy9pilTal7L2lCEczbGy4pW+gWeD+QyUF8gIARZUf0w==
+  dependencies:
+    wind-core "^1.1.1-alpha.2"
 
 leaflet@^1.8.0:
   version "1.8.0"
@@ -8433,6 +8445,13 @@ which@^2.0.1:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+wind-core@^1.1.1-alpha.2:
+  version "1.1.1-alpha.2"
+  resolved "https://registry.yarnpkg.com/wind-core/-/wind-core-1.1.1-alpha.2.tgz#7608eae3fe685213bf66c0eff9f912b2bd1ce35d"
+  integrity sha512-T19BxBljbHpRiJLI5Z5MR+seiQeVcondohyVXnUIqygfW7O9JABAPKKhACW0whgXMAwTZcXBLuWCbEICI+HJ6A==
+  dependencies:
+    gl-matrix "^3.3.0"
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.3"
