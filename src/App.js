@@ -6,14 +6,18 @@ import { useEffect } from "react";
 import $ from "jquery";
 import "leaflet-velocity";
 import { WindLayer } from "leaflet-wind";
+import moment from "moment";
 
 let map = null;
+let layerTime = null;
 
 function App() {
   useEffect(() => {
     if (map) return;
+    map = L.map("map");
+    map.setView([21.04549, 105.76257], 6);
 
-    const baseLayer = L.tileLayer(
+    L.tileLayer(
       "https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFuaG5pbmg5MSIsImEiOiJjazl3ODMyZjMwNzU0M2txNmJnMXh1cDk2In0.XHVqDEN-v2YVftKn5IAwsg",
       {
         attribution:
@@ -25,15 +29,7 @@ function App() {
         accessToken:
           "pk.eyJ1IjoibWFuaG5pbmg5MSIsImEiOiJjazl3ODMyZjMwNzU0M2txNmJnMXh1cDk2In0.XHVqDEN-v2YVftKn5IAwsg",
       }
-    );
-    map = L.map("map", { layers: baseLayer });
-    map.setView([21.04549, 105.76257], 6);
-
-    var baseLayers = {
-      "Base map": baseLayer,
-    };
-    var layerControl = L.control.layers(baseLayers);
-    layerControl.addTo(map);
+    ).addTo(map);
 
     // const tLayer = L.tileLayer
     //   .wms("http://103.27.239.181:8080/geoserver/SMAP/wms", {
@@ -50,97 +46,56 @@ function App() {
 
     // layerControl.addOverlay(tLayer, "Nhiệt độ");
 
-    for (let index = 0; index < 13; index++) {
-      $.getJSON(`${process.env.PUBLIC_URL}/wind${index}.json`, function (data) {
-        // var velocityLayer = L.velocityLayer({
-        //   displayValues: true,
-        //   displayOptions: {
-        //     velocityType: "GBR Wind",
-        //     position: "bottomleft",
-        //     emptyString: "No wind data",
-        //     showCardinal: true,
-        //   },
-        //   data: data,
-        //   maxVelocity: 10,
-        // });
-        // layerControl.addOverlay(velocityLayer, `Gió ${index}`);
+    // for (let index = 0; index < 13; index++) {
+    //   $.getJSON(`${process.env.PUBLIC_URL}/wind${index}.json`, function (data) {
+    // var velocityLayer = L.velocityLayer({
+    //   displayValues: true,
+    //   displayOptions: {
+    //     velocityType: "GBR Wind",
+    //     position: "bottomleft",
+    //     emptyString: "No wind data",
+    //     showCardinal: true,
+    //   },
+    //   data: data,
+    //   maxVelocity: 10,
+    // });
+    // layerControl.addOverlay(velocityLayer, `Gió ${index}`);
 
-        const velocityScale = [0.1, 0.2, 0.3, 0.4, 0.5];
-        const windLayer = new WindLayer("wind", data, {
-          // windOptions: {
-          //   // colorScale: (m) => {
-          //   //   // console.log(m);
-          //   //   return '#fff';
-          //   // },
-          //   colorScale: [
-          //     "rgb(36,104, 180)",
-          //     "rgb(60,157, 194)",
-          //     "rgb(128,205,193 )",
-          //     "rgb(151,218,168 )",
-          //     "rgb(198,231,181)",
-          //     "rgb(238,247,217)",
-          //     "rgb(255,238,159)",
-          //     "rgb(252,217,125)",
-          //     "rgb(255,182,100)",
-          //     "rgb(252,150,75)",
-          //     "rgb(250,112,52)",
-          //     "rgb(245,64,32)",
-          //     "rgb(237,45,28)",
-          //     "rgb(220,24,32)",
-          //     "rgb(180,0,35)",
-          //   ],
-          //   // velocityScale: 1 / 20,
-          //   // paths: 5000,
-          //   // frameRate: 16,
-          //   // maxAge: 60,
-          //   // globalAlpha: 0.9,
-          //   // velocityScale: () => {
-          //   //   return velocityScale[map.getZoom() - 5] * 0.1 || 0.1;
-          //   // },
-          //   // // paths: 10000,
-          //   // paths: 1000,
-          // },
-          windOptions: {
-            // colorScale: (m) => {
-            //   // console.log(m);
-            //   return '#fff';
-            // },
-            colorScale: [
-              "rgb(36,104, 180)",
-              "rgb(60,157, 194)",
-              "rgb(128,205,193 )",
-              "rgb(151,218,168 )",
-              "rgb(198,231,181)",
-              "rgb(238,247,217)",
-              "rgb(255,238,159)",
-              "rgb(252,217,125)",
-              "rgb(255,182,100)",
-              "rgb(252,150,75)",
-              "rgb(250,112,52)",
-              "rgb(245,64,32)",
-              "rgb(237,45,28)",
-              "rgb(220,24,32)",
-              "rgb(180,0,35)",
-            ],
-            // velocityScale: 1 / 20,
-            // paths: 5000,
-            frameRate: 16,
-            maxAge: 60,
-            globalAlpha: 0.9,
-            velocityScale: 1 / 500,
-            // paths: 880092,
-            generateParticleOption: true,
-            paths: () => {
-              // can be number or function
-              const zoom = map.getZoom();
-              return zoom * 1000;
-            },
-          },
-        });
-        layerControl.addOverlay(windLayer, `Gió ${index}`);
-        // map.addLayer(windLayer);
-      });
-    }
+    // const velocityScale = [0.1, 0.2, 0.3, 0.4, 0.5];
+    // const windLayer = new WindLayer("wind", data, {
+    //   windOptions: {
+    //     colorScale: [
+    //       "rgb(36,104, 180)",
+    //       "rgb(60,157, 194)",
+    //       "rgb(128,205,193 )",
+    //       "rgb(151,218,168 )",
+    //       "rgb(198,231,181)",
+    //       "rgb(238,247,217)",
+    //       "rgb(255,238,159)",
+    //       "rgb(252,217,125)",
+    //       "rgb(255,182,100)",
+    //       "rgb(252,150,75)",
+    //       "rgb(250,112,52)",
+    //       "rgb(245,64,32)",
+    //       "rgb(237,45,28)",
+    //       "rgb(220,24,32)",
+    //       "rgb(180,0,35)",
+    //     ],
+    //     frameRate: 16,
+    //     maxAge: 60,
+    //     globalAlpha: 0.9,
+    //     velocityScale: 1 / 500,
+    //     generateParticleOption: true,
+    //     paths: () => {
+    //       const zoom = map.getZoom();
+    //       return zoom * 1000;
+    //     },
+    //   },
+    // });
+    // layerControl.addBaseLayer(windLayer, `Gió ${index}`);
+    // map.addLayer(windLayer);
+    //   });
+    // }
 
     map.addEventListener("click", onMapClick);
   }, []);
@@ -169,14 +124,197 @@ function App() {
     map.openPopup(popup);
   };
 
+  const loadData = (time) => () => {
+    if(layerTime) map.removeLayer(layerTime);
+    layerTime = null;
+    $.getJSON(`${process.env.PUBLIC_URL}/wind_${time}.json`, function (data) {
+      layerTime = new WindLayer("wind", data, {
+        windOptions: {
+          colorScale: [
+            "rgb(36,104, 180)",
+            "rgb(60,157, 194)",
+            "rgb(128,205,193 )",
+            "rgb(151,218,168 )",
+            "rgb(198,231,181)",
+            "rgb(238,247,217)",
+            "rgb(255,238,159)",
+            "rgb(252,217,125)",
+            "rgb(255,182,100)",
+            "rgb(252,150,75)",
+            "rgb(250,112,52)",
+            "rgb(245,64,32)",
+            "rgb(237,45,28)",
+            "rgb(220,24,32)",
+            "rgb(180,0,35)",
+          ],
+          frameRate: 16,
+          maxAge: 60,
+          globalAlpha: 0.9,
+          velocityScale: 0.005,
+          generateParticleOption: true,
+          paths: () => {
+            const zoom = map.getZoom();
+            return zoom * 1000;
+          },
+        },
+      });
+      map.addLayer(layerTime);
+    });
+  };
+
   return (
-    <div
-      id="map"
-      style={{
-        width: "100%",
-        height: "100vh",
-      }}
-    ></div>
+    <>
+      <div
+        id="map"
+        style={{
+          width: "100%",
+          height: "100vh",
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          zIndex: 1000,
+          background: "#FFF",
+          display: "flex",
+          flexDirection: "column",
+          padding: 10,
+        }}
+      >
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("25012022120000")}
+          />{" "}
+          {moment("25012022120000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("25012022180000")}
+          />{" "}
+          {moment("25012022180000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("26012022000000")}
+          />{" "}
+          {moment("26012022000000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("26012022060000")}
+          />{" "}
+          {moment("26012022060000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("26012022120000")}
+          />{" "}
+          {moment("26012022120000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("26012022180000")}
+          />{" "}
+          {moment("26012022180000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("27012022000000")}
+          />{" "}
+          {moment("27012022000000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("27012022060000")}
+          />{" "}
+          {moment("27012022060000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("27012022120000")}
+          />{" "}
+          {moment("27012022120000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("27012022180000")}
+          />{" "}
+          {moment("27012022180000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("28012022000000")}
+          />{" "}
+          {moment("28012022000000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("28012022060000")}
+          />{" "}
+          {moment("28012022060000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="wind"
+            onClick={loadData("28012022120000")}
+          />{" "}
+          {moment("28012022120000", "DDMMYYYYHHmmss").format(
+            "DD/MM/YYYY HH:mm:ss"
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
