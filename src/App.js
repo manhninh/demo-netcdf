@@ -1,22 +1,21 @@
-import logo from "./logo.svg";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect } from "react";
 import $ from "jquery";
-import "leaflet-velocity";
 import { WindLayer } from "leaflet-wind";
 import moment from "moment";
+import "leaflet-webgl-heatmap";
+import "leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
 
 let map = null;
-let layerTime = null;
+let layerWind = null;
+let layerTems = null;
 
 function App() {
   useEffect(() => {
     if (map) return;
     map = L.map("map");
     map.setView([21.04549, 105.76257], 6);
-
     L.tileLayer(
       "https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFuaG5pbmg5MSIsImEiOiJjazl3ODMyZjMwNzU0M2txNmJnMXh1cDk2In0.XHVqDEN-v2YVftKn5IAwsg",
       {
@@ -30,73 +29,6 @@ function App() {
           "pk.eyJ1IjoibWFuaG5pbmg5MSIsImEiOiJjazl3ODMyZjMwNzU0M2txNmJnMXh1cDk2In0.XHVqDEN-v2YVftKn5IAwsg",
       }
     ).addTo(map);
-
-    // const tLayer = L.tileLayer
-    //   .wms("http://103.27.239.181:8080/geoserver/SMAP/wms", {
-    //     format: "image/png",
-    //     VERSION: "1.1.1",
-    //     tiled: true,
-    //     STYLES: "",
-    //     LAYERS: "SMAP:t",
-    //     exceptions: "application/vnd.ogc.se_inimage",
-    //     tilesOrigin: 97.7499973629945 + "," + 4.054536091177027,
-    //     transparent: true,
-    //   })
-    //   .addTo(map);
-
-    // layerControl.addOverlay(tLayer, "Nhiệt độ");
-
-    // for (let index = 0; index < 13; index++) {
-    //   $.getJSON(`${process.env.PUBLIC_URL}/wind${index}.json`, function (data) {
-    // var velocityLayer = L.velocityLayer({
-    //   displayValues: true,
-    //   displayOptions: {
-    //     velocityType: "GBR Wind",
-    //     position: "bottomleft",
-    //     emptyString: "No wind data",
-    //     showCardinal: true,
-    //   },
-    //   data: data,
-    //   maxVelocity: 10,
-    // });
-    // layerControl.addOverlay(velocityLayer, `Gió ${index}`);
-
-    // const velocityScale = [0.1, 0.2, 0.3, 0.4, 0.5];
-    // const windLayer = new WindLayer("wind", data, {
-    //   windOptions: {
-    //     colorScale: [
-    //       "rgb(36,104, 180)",
-    //       "rgb(60,157, 194)",
-    //       "rgb(128,205,193 )",
-    //       "rgb(151,218,168 )",
-    //       "rgb(198,231,181)",
-    //       "rgb(238,247,217)",
-    //       "rgb(255,238,159)",
-    //       "rgb(252,217,125)",
-    //       "rgb(255,182,100)",
-    //       "rgb(252,150,75)",
-    //       "rgb(250,112,52)",
-    //       "rgb(245,64,32)",
-    //       "rgb(237,45,28)",
-    //       "rgb(220,24,32)",
-    //       "rgb(180,0,35)",
-    //     ],
-    //     frameRate: 16,
-    //     maxAge: 60,
-    //     globalAlpha: 0.9,
-    //     velocityScale: 1 / 500,
-    //     generateParticleOption: true,
-    //     paths: () => {
-    //       const zoom = map.getZoom();
-    //       return zoom * 1000;
-    //     },
-    //   },
-    // });
-    // layerControl.addBaseLayer(windLayer, `Gió ${index}`);
-    // map.addLayer(windLayer);
-    //   });
-    // }
-
     map.addEventListener("click", onMapClick);
   }, []);
 
@@ -125,10 +57,27 @@ function App() {
   };
 
   const loadData = (time) => () => {
-    if(layerTime) map.removeLayer(layerTime);
-    layerTime = null;
+    if (layerWind) map.removeLayer(layerWind);
+    if (layerTems) map.removeLayer(layerTems);
+    layerWind = null;
+    layerTems = null;
+    // $.getJSON(`${process.env.PUBLIC_URL}/temps_${time}.json`, function (data) {
+    // console.log(JSON.parse(data.addressPoints), "data");
+    // var idw = L.idwLayer(JSON.parse(data.addressPoints), {
+    //   opacity: 0.3,
+    //   maxZoom: 18,
+    //   cellSize: 5,
+    //   exp: 3,
+    //   max: 75,
+    // });
+
+    //   var heatmap = L.webGLHeatmap({ size: 1000, units:"px" });
+    //   console.log(data.addressPoints);
+    //   heatmap.setData(JSON.parse(data.addressPoints));
+    //   map.addLayer(heatmap);
+    // });
     $.getJSON(`${process.env.PUBLIC_URL}/wind_${time}.json`, function (data) {
-      layerTime = new WindLayer("wind", data, {
+      layerWind = new WindLayer("wind", data, {
         windOptions: {
           colorScale: [
             "rgb(36,104, 180)",
@@ -158,7 +107,7 @@ function App() {
           },
         },
       });
-      map.addLayer(layerTime);
+      map.addLayer(layerWind);
     });
   };
 

@@ -9,13 +9,16 @@
     "jquery": "^3.6.0",
     "leaflet": "^1.8.0",
     "leaflet-velocity": "^2.1.2",
+    "leaflet-webgl-heatmap": "^0.2.7",
     "leaflet-wind": "^1.1.1-alpha.2",
+    "leaflet.idw": "^0.0.1",
     "moment": "^2.29.3",
     "react": "17",
     "react-dom": "17",
     "react-leaflet": "^3.2.5",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webgl-heatmap": "^0.2.3"
   },
   "scripts": {
     "start": "react-scripts start",
