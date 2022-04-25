@@ -15,7 +15,7 @@ function App() {
   useEffect(() => {
     if (map) return;
     map = L.map("map");
-    map.setView([21.04549, 105.76257], 6);
+    map.setView([21.04549, 105.76257], 5);
     L.tileLayer(
       "https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFuaG5pbmg5MSIsImEiOiJjazl3ODMyZjMwNzU0M2txNmJnMXh1cDk2In0.XHVqDEN-v2YVftKn5IAwsg",
       {
@@ -76,6 +76,22 @@ function App() {
     //   heatmap.setData(JSON.parse(data.addressPoints));
     //   map.addLayer(heatmap);
     // });
+    layerTems = L.tileLayer.wms(`http://103.27.239.181:8080/wms`, {
+      layers: "demo/t2m",
+      styles: "default-scalar/seq-Heat-inv",
+      transparent: true,
+      format: "image/png",
+      crs: L.CRS.EPSG4326,
+      TIME: moment(time, "DDMMYYYYHHmmss").format(
+        "YYYY-MM-DDTHH:mm:ss"
+      ),
+      COLORSCALERANGE: "263.4,306.7",
+      NUMCOLORBANDS: 250,
+      BGCOLOR: "transparent",
+    });
+
+    map.addLayer(layerTems);
+
     $.getJSON(`${process.env.PUBLIC_URL}/wind_${time}.json`, function (data) {
       layerWind = new WindLayer("wind", data, {
         windOptions: {
