@@ -6,6 +6,8 @@ import { WindLayer } from "leaflet-wind";
 import moment from "moment";
 import "leaflet-webgl-heatmap";
 import "leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
+import { getDirection, getSpeed } from "./calculatorWind";
+import XMLParser from "react-xml-parser";
 
 let map = null;
 let layerWind = null;
@@ -29,31 +31,66 @@ function App() {
           "pk.eyJ1IjoibWFuaG5pbmg5MSIsImEiOiJjazl3ODMyZjMwNzU0M2txNmJnMXh1cDk2In0.XHVqDEN-v2YVftKn5IAwsg",
       }
     ).addTo(map);
-    // map.addEventListener("click", onMapClick);
+    map.addEventListener("click", onMapClick);
   }, []);
 
   const onMapClick = (e) => {
-    const popup = new L.Popup({ maxWidth: 400 });
-    var BBOX =
-      map.getBounds()._southWest.lng +
-      "," +
-      map.getBounds()._southWest.lat +
-      "," +
-      map.getBounds()._northEast.lng +
-      "," +
-      map.getBounds()._northEast.lat;
-    var WIDTH = map.getSize().x;
-    var HEIGHT = map.getSize().y;
-    var X = map.layerPointToContainerPoint(e.layerPoint).x;
-    var Y = map.layerPointToContainerPoint(e.layerPoint).y;
-    var URL = `http://103.27.239.181:8080/geoserver/SMAP/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&FORMAT=image/jpeg&TRANSPARENT=true&QUERY_LAYERS=SMAP:t&STYLES&LAYERS=SMAP:t&exceptions=application/vnd.ogc.se_inimage&INFO_FORMAT=text/html&FEATURE_COUNT=50&X=${X}&Y=${Y}&SRS=EPSG:4326&WIDTH=${WIDTH}&HEIGHT=${HEIGHT}&BBOX=${BBOX}`;
-    popup.setLatLng(e.latlng);
-    popup.setContent(
-      "<iframe src='" +
-        URL +
-        "' width='400' height='100' frameborder='0'></iframe>"
-    );
-    map.openPopup(popup);
+    let huongGio = "";
+    let tocdoGio = "";
+    let nhietdo = "";
+    if (layerWind) {
+      console.log(e, "e");
+      const gridValue = layerWind.field.interpolatedValueAt(
+        e.latlng.lng,
+        e.latlng.lat
+      );
+      if (gridValue && !isNaN(gridValue.u) && !isNaN(gridValue.v)) {
+        const direction = getDirection(gridValue.u, gridValue.v, "bearingCCW");
+        huongGio = "Hướng gió: " + direction.toFixed(2) + "°";
+        const speed = getSpeed(gridValue.u, gridValue.v, "m/s");
+        tocdoGio = "Tốc độ gió: " + speed.toFixed(2) + " m/s";
+        console.log(direction, speed, "e=obj2");
+      }
+    }
+    if (layerTems) {
+      $.ajax({
+        url: `http://103.27.239.181:8080/wms`,
+        method: "GET",
+        async: false,
+        dataType: "html",
+        data: {
+          layers: "demo/t2m",
+          QUERY_LAYERS: "demo/t2m",
+          styles: "default-scalar/seq-Heat-inv",
+          INFO_FORMAT: "text/html",
+          FEATURE_COUNT: 5,
+          REQUEST: "GetFeatureInfo",
+          VERSION: "1.1.1",
+          SRS: "EPSG:4326",
+          BBOX: "97.617044,4.054536,126.355681,27.045445",
+          HEIGHT: 600,
+          WIDTH: 750,
+          X: e.containerPoint.x,
+          Y: e.containerPoint.y,
+        },
+        success: function (xml) {
+          console.log(xml, "xml");
+          // let release = json;
+          // console.log(release, "re");
+          nhietdo = $(xml).find("tbody td:last");
+        },
+      });
+    }
+    if (huongGio || tocdoGio) {
+      const popup = new L.Popup({ maxWidth: 500 });
+      popup.setLatLng(e.latlng);
+      popup.setContent(`
+    <p>${huongGio}</p>
+    <p>${tocdoGio}</p>
+<p>Nhiệt độ: ${nhietdo.html()} °K</p>
+    `);
+      map.openPopup(popup);
+    }
   };
 
   const loadData = (time) => () => {
@@ -61,30 +98,13 @@ function App() {
     if (layerTems) map.removeLayer(layerTems);
     layerWind = null;
     layerTems = null;
-    // $.getJSON(`${process.env.PUBLIC_URL}/temps_${time}.json`, function (data) {
-    // console.log(JSON.parse(data.addressPoints), "data");
-    // var idw = L.idwLayer(JSON.parse(data.addressPoints), {
-    //   opacity: 0.3,
-    //   maxZoom: 18,
-    //   cellSize: 5,
-    //   exp: 3,
-    //   max: 75,
-    // });
-
-    //   var heatmap = L.webGLHeatmap({ size: 1000, units:"px" });
-    //   console.log(data.addressPoints);
-    //   heatmap.setData(JSON.parse(data.addressPoints));
-    //   map.addLayer(heatmap);
-    // });
     layerTems = L.tileLayer.wms(`http://103.27.239.181:8080/wms`, {
       layers: "demo/t2m",
       styles: "default-scalar/seq-Heat-inv",
       transparent: true,
       format: "image/png",
       crs: L.CRS.EPSG4326,
-      TIME: moment(time, "DDMMYYYYHHmmss").format(
-        "YYYY-MM-DDTHH:mm:ss"
-      ),
+      TIME: moment(time, "DDMMYYYYHHmmss").format("YYYY-MM-DDTHH:mm:ss"),
       COLORSCALERANGE: "263.4,306.7",
       NUMCOLORBANDS: 250,
       BGCOLOR: "transparent",
@@ -115,7 +135,7 @@ function App() {
           frameRate: 16,
           maxAge: 60,
           globalAlpha: 0.9,
-          velocityScale: 0.005,
+          velocityScale: 0.002,
           generateParticleOption: true,
           paths: () => {
             const zoom = map.getZoom();
@@ -123,6 +143,7 @@ function App() {
           },
         },
       });
+      console.log(layerWind, "layerWind");
       map.addLayer(layerWind);
     });
   };
