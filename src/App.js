@@ -7,7 +7,6 @@ import moment from "moment";
 import "leaflet-webgl-heatmap";
 import "leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
 import { getDirection, getSpeed } from "./calculatorWind";
-import XMLParser from "react-xml-parser";
 
 let map = null;
 let layerWind = null;
@@ -39,7 +38,6 @@ function App() {
     let tocdoGio = "";
     let nhietdo = "";
     if (layerWind) {
-      console.log(e, "e");
       const gridValue = layerWind.field.interpolatedValueAt(
         e.latlng.lng,
         e.latlng.lat
@@ -49,7 +47,6 @@ function App() {
         huongGio = "Hướng gió: " + direction.toFixed(2) + "°";
         const speed = getSpeed(gridValue.u, gridValue.v, "m/s");
         tocdoGio = "Tốc độ gió: " + speed.toFixed(2) + " m/s";
-        console.log(direction, speed, "e=obj2");
       }
     }
     if (layerTems) {
@@ -74,20 +71,18 @@ function App() {
           Y: e.containerPoint.y,
         },
         success: function (xml) {
-          console.log(xml, "xml");
-          // let release = json;
-          // console.log(release, "re");
           nhietdo = $(xml).find("tbody td:last");
         },
       });
     }
     if (huongGio || tocdoGio) {
+      console.log(nhietdo, "nhietdo");
       const popup = new L.Popup({ maxWidth: 500 });
       popup.setLatLng(e.latlng);
       popup.setContent(`
     <p>${huongGio}</p>
     <p>${tocdoGio}</p>
-<p>Nhiệt độ: ${nhietdo.html()} °K</p>
+    ${nhietdo ? `<p>Nhiệt độ: ${nhietdo?.html()} °K</p>` : ""}
     `);
       map.openPopup(popup);
     }
