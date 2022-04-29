@@ -75,15 +75,14 @@ function App() {
       nhietdo = Number(data.features[0].properties.t2m).toFixed(0);
     }
     if (huongGio || tocdoGio) {
-      console.log(nhietdo, "nhietdo");
-      const popup = new L.Popup({ maxWidth: 500 });
-      popup.setLatLng(e.latlng);
-      popup.setContent(`
-    <p>${huongGio}</p>
-    <p>${tocdoGio}</p>
-    <p>Nhiệt độ: ${nhietdo} °K</p>
-    `);
-      map.openPopup(popup);
+      $("#bottom").html(`
+      <p>${huongGio}</p>
+      <p>${tocdoGio}</p>
+      <p>Nhiệt độ: ${nhietdo} °K</p>
+      `
+      );
+    }else{
+      $("#bottom").html(``);
     }
   };
 
@@ -147,6 +146,19 @@ function App() {
         style={{
           width: "100%",
           height: "100vh",
+        }}
+      />
+      <div
+      id="bottom"
+        style={{
+          position: "fixed",
+          bottom:0,
+          left: 0,
+          zIndex: 1000,
+          background: "#FFF",
+          display: "flex",
+          flexDirection: "column",
+          padding: 10,
         }}
       />
       <div
