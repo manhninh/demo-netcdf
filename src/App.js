@@ -74,16 +74,12 @@ function App() {
       console.log(data, "data");
       nhietdo = Number(data.features[0].properties.t2m).toFixed(0);
     }
-    if (huongGio || tocdoGio) {
       $("#bottom").html(`
       <p>${huongGio}</p>
       <p>${tocdoGio}</p>
       <p>Nhiệt độ: ${nhietdo} °K</p>
       `
       );
-    }else{
-      $("#bottom").html(``);
-    }
   };
 
   const loadData = (time, level) => () => {
