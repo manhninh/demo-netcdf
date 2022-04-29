@@ -68,8 +68,7 @@ function App() {
           Y: e.containerPoint.y,
         },
         success: function (xml) {
-          // nhietdo = Number(xml.features[0].properties.t2m).toFixed(0);
-          alert(`Nhiệt độ: ${xml.features[0].properties.t2m}`)
+          nhietdo = Number(xml.features[0].properties.t2m).toFixed(0);
         },
       });
     }
@@ -80,6 +79,7 @@ function App() {
       popup.setContent(`
     <p>${huongGio}</p>
     <p>${tocdoGio}</p>
+    <p>Nhiệt độ: ${nhietdo} °K</p>
     `);
       map.openPopup(popup);
     }
