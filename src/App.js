@@ -68,18 +68,18 @@ function App() {
           Y: e.containerPoint.y,
         },
         success: function (xml) {
-          nhietdo = Number(xml.features[0].properties.t2m).toFixed(0);
+          // nhietdo = Number(xml.features[0].properties.t2m).toFixed(0);
+          alert(`Nhiệt độ: ${xml.features[0].properties.t2m}`)
         },
       });
     }
-    if (huongGio || tocdoGio||nhietdo) {
+    if (huongGio || tocdoGio) {
       console.log(nhietdo, "nhietdo");
       const popup = new L.Popup({ maxWidth: 500 });
       popup.setLatLng(e.latlng);
       popup.setContent(`
     <p>${huongGio}</p>
     <p>${tocdoGio}</p>
-    <p>Nhiệt độ: ${nhietdo} °K</p>
     `);
       map.openPopup(popup);
     }
