@@ -29,7 +29,7 @@ function App() {
         accessToken: "pk.eyJ1IjoibWFuaG5pbmg5MSIsImEiOiJjazl3ODMyZjMwNzU0M2txNmJnMXh1cDk2In0.XHVqDEN-v2YVftKn5IAwsg",
       }
     ).addTo(map);
-    map.addEventListener("click", onMapClick);
+    map.on("click", onMapClick);
   }, []);
 
   const onMapClick = async (e) => {
