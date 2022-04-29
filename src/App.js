@@ -32,7 +32,7 @@ function App() {
     map.addEventListener("click", onMapClick);
   }, []);
 
-  const onMapClick = (e) => {
+  const onMapClick = async (e) => {
     let huongGio = "";
     let tocdoGio = "";
     let nhietdo = "";
@@ -47,30 +47,32 @@ function App() {
     }
     if (layerTems) {
       console.log(layerTems, "layerTems");
-      $.ajax({
-        url: `http://103.237.147.62:8080/geoserver/smap_netcdf/wms`,
+      const body = {
+        layers: layerTems.wmsParams.layers,
+        QUERY_LAYERS: layerTems.wmsParams.layers,
+        styles: "",
+        INFO_FORMAT: "application/json",
+        FEATURE_COUNT: 5,
+        REQUEST: "GetFeatureInfo",
+        VERSION: "1.1.1",
+        SRS: "EPSG:4326",
+        BBOX: "97.617044,4.054536,126.355681,27.045445",
+        HEIGHT: map.getSize().y,
+        WIDTH: map.getSize().x,
+        X: e.containerPoint.x,
+        Y: e.containerPoint.y,
+      };
+      let queryString = "";
+      if (body)
+        queryString = `?${Object.keys(body)
+          .map((key) => `${key}=${body[key] || ""}`)
+          .join("&")}`;
+      const response = await fetch(`http://103.237.147.62:8080/geoserver/smap_netcdf/wms${queryString}`, {
         method: "GET",
-        async: false,
-        dataType: "json",
-        data: {
-          layers: layerTems.wmsParams.layers,
-          QUERY_LAYERS: layerTems.wmsParams.layers,
-          styles: "",
-          INFO_FORMAT: "application/json",
-          FEATURE_COUNT: 5,
-          REQUEST: "GetFeatureInfo",
-          VERSION: "1.1.1",
-          SRS: "EPSG:4326",
-          BBOX: "97.617044,4.054536,126.355681,27.045445",
-          HEIGHT: map.getSize().y,
-          WIDTH: map.getSize().x,
-          X: e.containerPoint.x,
-          Y: e.containerPoint.y,
-        },
-        success: function (xml) {
-          nhietdo = Number(xml.features[0].properties.t2m).toFixed(0);
-        },
       });
+      const data = await response.json();
+      console.log(data, "data");
+      nhietdo = Number(data.features[0].properties.t2m).toFixed(0);
     }
     if (huongGio || tocdoGio) {
       console.log(nhietdo, "nhietdo");
@@ -91,7 +93,7 @@ function App() {
     layerWind = null;
     layerTems = null;
     layerTems = L.tileLayer.wms(`http://103.237.147.62:8080/geoserver/smap_netcdf/wms`, {
-      format: 'image/png',
+      format: "image/png",
       version: "1.1.1",
       tiled: true,
       styles: "",
