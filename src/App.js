@@ -69,6 +69,7 @@ function App() {
           .join("&")}`;
       const response = await fetch(`http://103.237.147.62:8080/geoserver/smap_netcdf/wms${queryString}`, {
         method: "GET",
+        headers:{Accept: 'application/json', 'Content-Type': 'application/json'}
       });
       const data = await response.json();
       console.log(data, "data");
